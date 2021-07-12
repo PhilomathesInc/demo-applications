@@ -8,12 +8,6 @@ const port = process.env.PORT || 8080;
 
 app.use(pino);
 
-app.get('/', (req, res) => {
-	req.log.info();
-	const target = process.env.TARGET || 'World';
-	res.send(`Hello ${target}!\n`);
-});
-
 app.get('/errorz', (req, res) => {
 	req.log.error();
 	res.status(500).send('Something broke!');
