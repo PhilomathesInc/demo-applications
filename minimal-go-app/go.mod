@@ -1,4 +1,4 @@
-module github.com/PhilomathesInc/demo-applications/minimal-go-app
+module github.com/philomathesinc/demo-applications/minimal-go-app
 
 go 1.15
 
