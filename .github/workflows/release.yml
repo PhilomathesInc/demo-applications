@@ -4,10 +4,14 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  release:
-    name: Create Release
+  release-binaries:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -30,3 +34,30 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./minimal-go-app
+          push: true
+          tags: ${{ github.ref }}
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
